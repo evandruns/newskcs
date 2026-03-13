@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athenas Support — Central de Conhecimento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0a0f1e;
+            --blue: #1d4ed8;
+            --blue-light: #3b82f6;
+            --teal: #0d9488;
+            --slate: #1e293b;
+            --muted: #64748b;
+            --surface: #f0f4ff;
+            --border: rgba(30,41,59,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: #fff; color: var(--slate); overflow-x: hidden; }
+
+        /* NAV */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(10,15,30,0.96);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: #fff; letter-spacing: -0.02em; text-decoration: none; }
+        .nav-brand span { color: var(--blue-light); }
+        .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-links a {
+            font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500;
+            color: rgba(255,255,255,0.55); text-decoration: none;
+            padding: 0.35rem 0.85rem; border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+        .nav-links a.active { color: #fff; background: rgba(59,130,246,0.2); }
+        .nav-badge {
+            font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em;
+            background: var(--blue); color: #fff;
+            padding: 0.15rem 0.45rem; border-radius: 99px;
+            margin-left: 0.3rem; vertical-align: middle;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 140px 2rem 80px;
+            background: var(--navy);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -200px; right: -200px;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(29,78,216,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: -100px; left: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--blue-light); margin-bottom: 1.5rem;
+        }
+        .hero-tag::before { content: ''; display: block; width: 24px; height: 2px; background: var(--blue-light); }
+        .hero h1 {
+            font-family: 'Syne', sans-serif; font-weight: 800;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            color: #fff; line-height: 1.05; letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 em { font-style: normal; color: var(--blue-light); }
+        .hero p { font-size: 1.1rem; color: rgba(255,255,255,0.5); max-width: 560px; line-height: 1.7; }
+        .hero-stats {
+            display: flex; gap: 3rem; margin-top: 3.5rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .stat-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; }
+        .stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-top: 0.15rem; }
+
+        /* MAIN GRID */
+        .main-section { max-width: 900px; margin: 0 auto; padding: 5rem 2rem; }
+        .section-label {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--blue); margin-bottom: 2.5rem;
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        /* CARDS */
+        .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
+
+        .hub-card {
+            display: block; text-decoration: none;
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 2.5rem; position: relative; overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fff;
+        }
+        .hub-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(29,78,216,0.15); border-color: rgba(29,78,216,0.2); }
+        .hub-card.dark { background: var(--navy); border-color: rgba(255,255,255,0.06); }
+        .hub-card.dark:hover { box-shadow: 0 20px 40px -12px rgba(0,0,0,0.4); border-color: rgba(59,130,246,0.3); }
+
+        .card-icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 1.5rem;
+        }
+        .card-icon.blue { background: rgba(29,78,216,0.1); }
+        .card-icon.teal { background: rgba(13,148,136,0.1); }
+
+        .hub-card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--slate); }
+        .hub-card.dark h3 { color: #fff; }
+        .hub-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+        .hub-card.dark p { color: rgba(255,255,255,0.4); }
+
+        .card-arrow {
+            position: absolute; bottom: 2rem; right: 2rem;
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--surface); display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; transition: all 0.2s;
+            color: var(--blue);
+        }
+        .hub-card.dark .card-arrow { background: rgba(255,255,255,0.07); color: var(--blue-light); }
+        .hub-card:hover .card-arrow { background: var(--blue); color: #fff; transform: translate(2px, -2px); }
+
+        /* KCS NEWS LIST */
+        .kcs-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        .kcs-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.2rem 1.75rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+            text-decoration: none; color: inherit;
+        }
+        .kcs-item:last-child { border-bottom: none; }
+        .kcs-item:hover { background: var(--surface); }
+        .kcs-item-left { display: flex; align-items: center; gap: 1rem; }
+        .kcs-edition {
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+            color: var(--blue); min-width: 70px;
+        }
+        .kcs-title { font-size: 0.9rem; color: var(--slate); }
+        .kcs-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+        .kcs-badge {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 0.2rem 0.6rem; border-radius: 99px;
+            background: rgba(29,78,216,0.08); color: var(--blue);
+        }
+        .kcs-badge.latest { background: rgba(13,148,136,0.1); color: var(--teal); }
+
+        /* FOOTER */
+        footer {
+            background: var(--navy); color: rgba(255,255,255,0.3);
+            text-align: center; padding: 2rem;
+            font-size: 0.78rem;
+        }
+        footer span { color: var(--blue-light); }
+    </style>
+</head>
+<body>
+
+    <!-- SHARED NAV -->
+    <nav class="top-nav">
+        <a href="index.html" class="nav-brand">Athenas <span>Support</span></a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Início</a>
+            <a href="manual.html">Manual</a>
+            <a href="kcs-news/02-2026.html">KCS News <span class="nav-badge">NEW</span></a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-tag">Central de Conhecimento</div>
+            <h1>Tudo que você precisa<br/>para o <em>suporte Athenas</em></h1>
+            <p>Manual operacional, GEMs especializadas e atualizações KCS — centralizados em um só lugar para o time de analistas.</p>
+            <div class="hero-stats">
+                <div>
+                    <div class="stat-num">3</div>
+                    <div class="stat-label">GEMs Athena</div>
+                </div>
+                <div>
+                    <div class="stat-num">02/26</div>
+                    <div class="stat-label">Última edição KCS</div>
+                </div>
+                <div>
+                    <div class="stat-num">5</div>
+                    <div class="stat-label">Artigos este mês</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="main-section">
+
+            <!-- ACESSO RÁPIDO -->
+            <div class="section-label">Acesso Rápido</div>
+            <div class="cards-grid" style="margin-bottom: 4rem;">
+
+                <a href="manual.html" class="hub-card dark">
+                    <div class="card-icon blue">📋</div>
+                    <h3>Manual Operacional</h3>
+                    <p>Fluxo padronizado de suporte, GEMs Athena e passos operacionais para diagnóstico.</p>
+                    <div class="card-arrow">→</div>
+                </a>
+
+                <a href="kcs-news/02-2026.html" class="hub-card">
+                    <div class="card-icon teal">📰</div>
+                    <h3>KCS News — 02/2026</h3>
+                    <p>5 artigos novos criados na 2ª quinzena. SIGACTB, Ativo Fixo e norma IFRS18.</p>
+                    <div class="card-arrow">→</div>
+                </a>
+
+            </div>
+
+            <!-- EDIÇÕES KCS -->
+            <div class="section-label">Edições KCS News</div>
+            <div class="kcs-list">
+                <a href="kcs-news/02-2026.html" class="kcs-item">
+                    <div class="kcs-item-left">
+                        <div class="kcs-edition">02/2026</div>
+                        <div>
+                            <div class="kcs-title">KCS News — 2ª Quinzena Fevereiro</div>
+                            <div class="kcs-meta">23/02/2026 a 27/02/2026 · 5 artigos novos</div>
+                        </div>
+                    </div>
+                    <span class="kcs-badge latest">Mais recente</span>
+                </a>
+                <!-- Adicione novas edições aqui seguindo o mesmo padrão -->
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        Athenas <span>Support</span> &mdash; Central de Conhecimento Interno &mdash; TOTVS
+    </footer>
+
+</body>
+</html>
