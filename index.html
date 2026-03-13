@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Athenas Support — Central de Conhecimento</title>
+    <title>Athena Support — Central de Conhecimento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -12,6 +12,8 @@
             --blue: #1d4ed8;
             --blue-light: #3b82f6;
             --teal: #0d9488;
+            --violet: #7c3aed;
+            --orange: #ea580c;
             --slate: #1e293b;
             --muted: #64748b;
             --surface: #f0f4ff;
@@ -30,37 +32,20 @@
         .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: #fff; letter-spacing: -0.02em; text-decoration: none; }
         .nav-brand span { color: var(--blue-light); }
         .nav-links { display: flex; align-items: center; gap: 0.25rem; }
-        .nav-links a {
-            font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.55);
-            text-decoration: none; padding: 0.35rem 0.85rem; border-radius: 6px; transition: all 0.2s;
-        }
+        .nav-links a { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; padding: 0.35rem 0.85rem; border-radius: 6px; transition: all 0.2s; }
         .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.07); }
         .nav-links a.active { color: #fff; background: rgba(59,130,246,0.2); }
-        .nav-badge {
-            font-size: 0.6rem; font-weight: 700; background: var(--blue); color: #fff;
-            padding: 0.15rem 0.45rem; border-radius: 99px; margin-left: 0.3rem; vertical-align: middle;
-        }
 
-        .hero {
-            padding: 120px 2rem 70px; background: var(--navy); position: relative; overflow: hidden;
-        }
-        .hero::before {
-            content: ''; position: absolute; top: -200px; right: -200px;
-            width: 700px; height: 700px;
-            background: radial-gradient(circle, rgba(29,78,216,0.18) 0%, transparent 70%);
-        }
-        .hero::after {
-            content: ''; position: absolute; bottom: -100px; left: -100px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%);
-        }
+        .hero { padding: 120px 2rem 70px; background: var(--navy); position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(29,78,216,0.18) 0%, transparent 70%); }
+        .hero::after { content: ''; position: absolute; bottom: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%); }
         .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
         .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue-light); margin-bottom: 1.5rem; }
         .hero-tag::before { content: ''; display: block; width: 24px; height: 2px; background: var(--blue-light); }
         .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2.2rem, 5vw, 4rem); color: #fff; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
         .hero h1 em { font-style: normal; color: var(--blue-light); }
         .hero p { font-size: 1rem; color: rgba(255,255,255,0.5); max-width: 520px; line-height: 1.7; }
-        .hero-stats { display: flex; gap: 3rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06); }
+        .hero-stats { display: flex; gap: 3rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
         .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: #fff; }
         .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 0.1rem; }
 
@@ -86,6 +71,21 @@
         .hub-card.dark .card-arrow { background: rgba(255,255,255,0.07); color: var(--blue-light); }
         .hub-card:hover .card-arrow { background: var(--blue); color: #fff; transform: translate(2px,-2px); }
 
+        /* TEAM TABS */
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab-btn {
+            font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+            padding: 0.45rem 1rem; border-radius: 99px; border: 1.5px solid var(--border);
+            background: #fff; color: var(--muted); cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .tab-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .tab-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+        .tab-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .team-panel { display: none; }
+        .team-panel.active { display: block; }
+
         /* KCS LIST */
         .kcs-list { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
         .kcs-item { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); transition: background 0.15s; text-decoration: none; color: inherit; }
@@ -102,6 +102,7 @@
         .loading { display: flex; align-items: center; gap: 0.75rem; padding: 2rem 1.5rem; color: var(--muted); font-size: 0.88rem; }
         .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-msg { padding: 2rem 1.5rem; color: var(--muted); font-size: 0.85rem; text-align: center; border: 1px dashed var(--border); border-radius: 16px; }
         .error-msg { padding: 1.5rem; color: #dc2626; font-size: 0.85rem; }
 
         footer { background: var(--navy); color: rgba(255,255,255,0.3); text-align: center; padding: 2rem; font-size: 0.78rem; }
@@ -111,7 +112,7 @@
 <body>
 
     <nav class="top-nav">
-        <a href="/newskcs/" class="nav-brand">Athenas <span>Support</span></a>
+        <a href="/newskcs/" class="nav-brand">Athena <span>Support</span></a>
         <div class="nav-links">
             <a href="/newskcs/" class="active">Início</a>
             <a href="manual.html">Manual</a>
@@ -122,7 +123,7 @@
     <section class="hero">
         <div class="hero-inner">
             <div class="hero-tag">Central de Conhecimento</div>
-            <h1>Tudo que você precisa<br/>para o <em>suporte Athenas</em></h1>
+            <h1>Tudo que você precisa<br/>para o <em>suporte Athena</em></h1>
             <p>Manual operacional, GEMs especializadas e atualizações KCS — centralizados em um só lugar para o time de analistas.</p>
             <div class="hero-stats">
                 <div>
@@ -130,12 +131,12 @@
                     <div class="stat-label">GEMs Athena</div>
                 </div>
                 <div>
-                    <div class="stat-num" id="stat-edicoes">—</div>
-                    <div class="stat-label">Edições KCS</div>
+                    <div class="stat-num">3</div>
+                    <div class="stat-label">Equipes KCS</div>
                 </div>
                 <div>
-                    <div class="stat-num" id="stat-latest">—</div>
-                    <div class="stat-label">Última edição</div>
+                    <div class="stat-num" id="stat-total">—</div>
+                    <div class="stat-label">Total de edições</div>
                 </div>
             </div>
         </div>
@@ -152,19 +153,46 @@
                     <p>Fluxo padronizado de suporte, GEMs Athena e passos operacionais para diagnóstico.</p>
                     <div class="card-arrow">→</div>
                 </a>
-                <a href="#edicoes" id="card-kcs-link" class="hub-card">
+                <a href="#edicoes" class="hub-card">
                     <div class="card-icon teal">📰</div>
                     <h3>KCS News</h3>
-                    <p id="card-kcs-desc">Carregando última edição...</p>
+                    <p id="card-kcs-desc">3 equipes publicando atualizações de documentação KCS.</p>
                     <div class="card-arrow">→</div>
                 </a>
             </div>
 
-            <div class="section-label" id="edicoes">Edições KCS News</div>
-            <div class="kcs-list" id="kcs-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    Buscando edições no repositório...
+            <div class="section-label" id="edicoes">Edições KCS News por Equipe</div>
+
+            <!-- TEAM TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('ativo-contabil')">
+                    <span class="tab-dot" style="background:#1d4ed8;"></span>
+                    Ativo &amp; Contábil
+                </button>
+                <button class="tab-btn" onclick="switchTab('trade')">
+                    <span class="tab-dot" style="background:#0d9488;"></span>
+                    Trade
+                </button>
+                <button class="tab-btn" onclick="switchTab('advpl')">
+                    <span class="tab-dot" style="background:#7c3aed;"></span>
+                    AdvPL
+                </button>
+            </div>
+
+            <!-- PANELS -->
+            <div id="panel-ativo-contabil" class="team-panel active">
+                <div class="kcs-list" id="list-ativo-contabil">
+                    <div class="loading"><div class="spinner"></div>Carregando edições...</div>
+                </div>
+            </div>
+            <div id="panel-trade" class="team-panel">
+                <div class="kcs-list" id="list-trade">
+                    <div class="loading"><div class="spinner"></div>Carregando edições...</div>
+                </div>
+            </div>
+            <div id="panel-advpl" class="team-panel">
+                <div class="kcs-list" id="list-advpl">
+                    <div class="loading"><div class="spinner"></div>Carregando edições...</div>
                 </div>
             </div>
 
@@ -172,90 +200,90 @@
     </main>
 
     <footer>
-        Athenas <span>Support</span> &mdash; Central de Conhecimento Interno &mdash; TOTVS
+        Athena <span>Support</span> &mdash; Central de Conhecimento Interno &mdash; TOTVS
     </footer>
 
     <script>
         const GITHUB_USER = 'evandruns';
         const GITHUB_REPO = 'newskcs';
-        const GITHUB_FOLDER = 'kcs-news';
 
-        // Parse edition label from filename like "02-2026.html" → "02/2026"
+        const TEAMS = [
+            { id: 'ativo-contabil', folder: 'kcs-news/ativo-contabil', label: 'Ativo & Contábil', color: '#1d4ed8' },
+            { id: 'trade',          folder: 'kcs-news/trade',          label: 'Trade',            color: '#0d9488' },
+            { id: 'advpl',          folder: 'kcs-news/advpl',          label: 'AdvPL',            color: '#7c3aed' },
+        ];
+
+        const MONTHS = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
         function parseEdition(filename) {
             const m = filename.match(/^(\d{2})-(\d{4})\.html$/);
             if (!m) return null;
             return { file: filename, label: `${m[1]}/${m[2]}`, month: parseInt(m[1]), year: parseInt(m[2]) };
         }
 
-        // Month names in Portuguese
-        const MONTHS = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
         function friendlyTitle(ed) {
             return `KCS News — ${MONTHS[ed.month]} ${ed.year}`;
         }
 
-        async function loadEditions() {
-            const list = document.getElementById('kcs-list');
+        function switchTab(teamId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.team-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${teamId}')"]`).classList.add('active');
+            document.getElementById(`panel-${teamId}`).classList.add('active');
+        }
+
+        async function loadTeam(team) {
+            const listEl = document.getElementById(`list-${team.id}`);
             try {
                 const res = await fetch(
-                    `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`,
+                    `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${team.folder}`,
                     { headers: { 'Accept': 'application/vnd.github.v3+json' } }
                 );
-                if (!res.ok) throw new Error(`GitHub API retornou ${res.status}`);
-                const files = await res.json();
 
-                // Filter and parse only edition HTML files
+                if (res.status === 404) {
+                    listEl.innerHTML = `<div class="empty-msg">📂 Nenhuma edição publicada ainda pela equipe <strong>${team.label}</strong>.</div>`;
+                    return 0;
+                }
+                if (!res.ok) throw new Error(`GitHub API retornou ${res.status}`);
+
+                const files = await res.json();
                 const editions = files
                     .map(f => parseEdition(f.name))
                     .filter(Boolean)
                     .sort((a, b) => b.year !== a.year ? b.year - a.year : b.month - a.month);
 
                 if (editions.length === 0) {
-                    list.innerHTML = '<div class="error-msg">Nenhuma edição encontrada na pasta kcs-news/.</div>';
-                    return;
+                    listEl.innerHTML = `<div class="empty-msg">📂 Nenhuma edição publicada ainda pela equipe <strong>${team.label}</strong>.</div>`;
+                    return 0;
                 }
 
-                // Update hero stats
-                document.getElementById('stat-edicoes').textContent = editions.length;
-                document.getElementById('stat-latest').textContent = editions[0].label;
-
-                // Update quick-access card
-                document.getElementById('card-kcs-desc').textContent =
-                    `Última edição: ${editions[0].label}. Clique para ver todas.`;
-                document.getElementById('card-kcs-link').href = `${GITHUB_FOLDER}/${editions[0].file}`;
-                document.getElementById('nav-kcs-link').href = `${GITHUB_FOLDER}/${editions[0].file}`;
-                document.getElementById('nav-kcs-link').innerHTML =
-                    `KCS News <span class="nav-badge">${editions[0].label}</span>`;
-
-                // Render list
-                list.innerHTML = editions.map((ed, i) => `
-                    <a href="${GITHUB_FOLDER}/${ed.file}" class="kcs-item">
+                listEl.innerHTML = editions.map((ed, i) => `
+                    <a href="${team.folder}/${ed.file}" class="kcs-item">
                         <div class="kcs-item-left">
-                            <div class="kcs-edition">${ed.label}</div>
+                            <div class="kcs-edition" style="color:${team.color}">${ed.label}</div>
                             <div>
                                 <div class="kcs-title">${friendlyTitle(ed)}</div>
-                                <div class="kcs-meta">${ed.label}</div>
+                                <div class="kcs-meta">${team.label} · ${ed.label}</div>
                             </div>
                         </div>
                         <span class="kcs-badge ${i === 0 ? 'latest' : 'older'}">${i === 0 ? 'Mais recente' : 'Anterior'}</span>
                     </a>
                 `).join('');
 
+                return editions.length;
             } catch (err) {
-                list.innerHTML = `<div class="error-msg">Erro ao carregar edições: ${err.message}</div>`;
-                console.error(err);
+                listEl.innerHTML = `<div class="error-msg">Erro ao carregar: ${err.message}</div>`;
+                return 0;
             }
         }
 
-        loadEditions();
+        async function init() {
+            const counts = await Promise.all(TEAMS.map(loadTeam));
+            const total = counts.reduce((a, b) => a + b, 0);
+            document.getElementById('stat-total').textContent = total;
+        }
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', e => {
-                const el = document.querySelector(a.getAttribute('href'));
-                if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); }
-            });
-        });
+        init();
     </script>
 </body>
 </html>
