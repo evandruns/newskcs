@@ -206,6 +206,7 @@
     <script>
         const GITHUB_USER = 'evandruns';
         const GITHUB_REPO = 'newskcs';
+        const BASE_URL = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}`;
 
         const TEAMS = [
             { id: 'ativo-contabil', folder: 'ativo-contabil', label: 'Ativo & Contábil', color: '#1d4ed8' },
@@ -215,10 +216,18 @@
 
         const MONTHS = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-        function parseEdition(filename) {
-            const m = filename.match(/^(\d{2})-(\d{4})\.html$/);
-            if (!m) return null;
-            return { file: filename, label: `${m[1]}/${m[2]}`, month: parseInt(m[1]), year: parseInt(m[2]) };
+        // Gera lista de edições possíveis: MM-YYYY de 2026 até hoje
+        function possibleEditions() {
+            const editions = [];
+            const now = new Date();
+            for (let year = 2026; year <= now.getFullYear(); year++) {
+                const maxMonth = year < now.getFullYear() ? 12 : now.getMonth() + 1;
+                for (let month = 1; month <= maxMonth; month++) {
+                    const mm = String(month).padStart(2, '0');
+                    editions.push({ file: `${mm}-${year}.html`, label: `${mm}/${year}`, month, year });
+                }
+            }
+            return editions.reverse(); // mais recente primeiro
         }
 
         function friendlyTitle(ed) {
@@ -232,49 +241,46 @@
             document.getElementById(`panel-${teamId}`).classList.add('active');
         }
 
+        async function fileExists(url) {
+            try {
+                const res = await fetch(url, { method: 'HEAD' });
+                return res.ok;
+            } catch { return false; }
+        }
+
         async function loadTeam(team) {
             const listEl = document.getElementById(`list-${team.id}`);
-            try {
-                const res = await fetch(
-                    `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${team.folder}`,
-                    { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-                );
+            const candidates = possibleEditions();
 
-                if (res.status === 404) {
-                    listEl.innerHTML = `<div class="empty-msg">📂 Nenhuma edição publicada ainda pela equipe <strong>${team.label}</strong>.</div>`;
-                    return 0;
-                }
-                if (!res.ok) throw new Error(`GitHub API retornou ${res.status}`);
+            // Verifica quais arquivos existem em paralelo
+            const checks = await Promise.all(
+                candidates.map(ed => ({
+                    ed,
+                    promise: fileExists(`${BASE_URL}/${team.folder}/${ed.file}`)
+                })).map(async ({ ed, promise }) => ({ ed, exists: await promise }))
+            );
 
-                const files = await res.json();
-                const editions = files
-                    .map(f => parseEdition(f.name))
-                    .filter(Boolean)
-                    .sort((a, b) => b.year !== a.year ? b.year - a.year : b.month - a.month);
+            const found = checks.filter(c => c.exists).map(c => c.ed);
 
-                if (editions.length === 0) {
-                    listEl.innerHTML = `<div class="empty-msg">📂 Nenhuma edição publicada ainda pela equipe <strong>${team.label}</strong>.</div>`;
-                    return 0;
-                }
-
-                listEl.innerHTML = editions.map((ed, i) => `
-                    <a href="${team.folder}/${ed.file}" class="kcs-item">
-                        <div class="kcs-item-left">
-                            <div class="kcs-edition" style="color:${team.color}">${ed.label}</div>
-                            <div>
-                                <div class="kcs-title">${friendlyTitle(ed)}</div>
-                                <div class="kcs-meta">${team.label} · ${ed.label}</div>
-                            </div>
-                        </div>
-                        <span class="kcs-badge ${i === 0 ? 'latest' : 'older'}">${i === 0 ? 'Mais recente' : 'Anterior'}</span>
-                    </a>
-                `).join('');
-
-                return editions.length;
-            } catch (err) {
-                listEl.innerHTML = `<div class="error-msg">Erro ao carregar: ${err.message}</div>`;
+            if (found.length === 0) {
+                listEl.innerHTML = `<div class="empty-msg">📂 Nenhuma edição publicada ainda pela equipe <strong>${team.label}</strong>.</div>`;
                 return 0;
             }
+
+            listEl.innerHTML = found.map((ed, i) => `
+                <a href="${BASE_URL}/${team.folder}/${ed.file}" class="kcs-item">
+                    <div class="kcs-item-left">
+                        <div class="kcs-edition" style="color:${team.color}">${ed.label}</div>
+                        <div>
+                            <div class="kcs-title">${friendlyTitle(ed)}</div>
+                            <div class="kcs-meta">${team.label} · ${ed.label}</div>
+                        </div>
+                    </div>
+                    <span class="kcs-badge ${i === 0 ? 'latest' : 'older'}">${i === 0 ? 'Mais recente' : 'Anterior'}</span>
+                </a>
+            `).join('');
+
+            return found.length;
         }
 
         async function init() {
