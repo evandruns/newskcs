@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Fluxo Operacional de Suporte | TOTVS Athenas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            soft: '#f8fafc',
+                            muted: '#64748b',
+                            highlight: '#10b981', // emerald
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .sidebar-sticky {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        .content-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .content-card:hover {
+            transform: translateY(-2px);
+        }
+        .step-number {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            border-left: 4px solid #0ea5e9;
+        }
+        .toc-link.active {
+            color: #0ea5e9;
+            border-left: 2px solid #0ea5e9;
+            padding-left: 0.75rem;
+            font-weight: 600;
+        }
+        .toc-link {
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            padding-left: 0.75rem;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-brand-50 text-slate-800 font-sans selection:bg-brand-200">
+
+    <!-- Shared Nav -->
+    <style>
+        .top-nav-shared {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(10,15,30,0.96);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-brand-shared { font-weight: 800; font-size: 1rem; color: #fff; text-decoration: none; letter-spacing: -0.02em; }
+        .nav-brand-shared span { color: #3b82f6; }
+        .nav-links-shared { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-links-shared a {
+            font-size: 0.78rem; font-weight: 500;
+            color: rgba(255,255,255,0.55); text-decoration: none;
+            padding: 0.35rem 0.85rem; border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-links-shared a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+        .nav-links-shared a.active { color: #fff; background: rgba(59,130,246,0.2); }
+        .nav-badge-shared {
+            font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em;
+            background: #1d4ed8; color: #fff;
+            padding: 0.15rem 0.45rem; border-radius: 99px;
+            margin-left: 0.3rem; vertical-align: middle;
+        }
+    </style>
+    <nav class="top-nav-shared">
+        <a href="../index.html" class="nav-brand-shared">Athenas <span>Support</span></a>
+        <div class="nav-links-shared">
+            <a href="../index.html">Início</a>
+            <a href="manual.html" class="active">Manual</a>
+            <a href="../kcs-news/02-2026.html">KCS News <span class="nav-badge-shared">NEW</span></a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 pt-20 pb-20">
+        <div class="flex flex-col lg:flex-row gap-12">
+            
+            <!-- Table of Contents Sidebar -->
+            <aside class="hidden lg:block w-72 flex-shrink-0">
+                <div class="sidebar-sticky">
+                    <h4 class="font-display font-bold text-slate-900 mb-6 uppercase tracking-wider text-sm">Nesta Página</h4>
+                    <nav class="flex flex-col gap-4 text-sm text-slate-500">
+                        <a href="#introducao" class="toc-link hover:text-brand-600">1. Introdução</a>
+                        <a href="#recursos" class="toc-link hover:text-brand-600">2. Principais Recursos</a>
+                        <a href="#ferramentas" class="toc-link hover:text-brand-600">3. Ferramentas de Auxílio</a>
+                        <a href="#passos" class="toc-link hover:text-brand-600">4. Passos Operacionais</a>
+                        <a href="#exemplos" class="toc-link hover:text-brand-600">5. Exemplos de Uso</a>
+                        <a href="#dicas" class="toc-link hover:text-brand-600">6. Solução de Problemas</a>
+                    </nav>
+                    <div class="mt-12 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                        <p class="text-xs font-semibold text-brand-600 mb-2">PRECISA DE AJUDA?</p>
+                        <p class="text-sm text-slate-600 leading-relaxed">Utilize as GEMs Athena específicas para cada área técnica.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <article class="flex-1 max-w-4xl">
+                <!-- Hero Section -->
+                <header class="mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">
+                        Manual de Fluxo Operacional de Suporte <span class="gradient-text">Athenas/TOTVS</span>
+                    </h2>
+                    <p class="text-xl text-slate-500 leading-relaxed max-w-3xl">
+                        Guia de padronização e otimização para analistas, integrando ferramentas de pesquisa avançada e modelos de inteligência artificial especializada.
+                    </p>
+                </header>
+
+                <!-- Section 1 -->
+                <section id="introducao" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">1. Introdução</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+                    <div class="bg-white p-8 md:p-10 rounded-3xl border border-slate-100 shadow-sm leading-relaxed text-lg text-slate-600">
+                        Este manual detalha um fluxo operacional padronizado e otimizado para o ecossistema TOTVS, focando em sistemas como <strong>Athenas (GEM)</strong>. O objetivo é orientar o analista na utilização eficaz das GEMs Athena e ferramentas de pesquisa para um diagnóstico consistente.
+                    </div>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="recursos" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">2. Principais Recursos</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+
+                    <!-- Tabs/Bento Grid for Phases -->
+                    <div class="space-y-8">
+                        <!-- Phase 1 -->
+                        <div class="content-card bg-slate-900 text-white p-8 rounded-3xl overflow-hidden relative group">
+                            <div class="absolute top-0 right-0 p-8 text-8xl font-bold opacity-5 group-hover:opacity-10 transition-opacity">01</div>
+                            <span class="inline-block px-3 py-1 bg-brand-500 text-xs font-bold rounded-full mb-4">FASE 1</span>
+                            <h4 class="text-2xl font-bold mb-6">Entendimento e Pesquisa Histórica</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <a href="https://totvssuporte.zendesk.com/agent/search" target="_blank" class="p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors">
+                                    <p class="font-bold text-brand-200 mb-1">Zendesk</p>
+                                    <p class="text-xs text-slate-400">Histórico de chamados e soluções anteriores.</p>
+                                </a>
+                                <a href="https://centraldeatendimento.totvs.com/hc/pt-br/search" target="_blank" class="p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors">
+                                    <p class="font-bold text-brand-200 mb-1">KCS</p>
+                                    <p class="text-xs text-slate-400">Artigos oficiais e documentação técnica.</p>
+                                </a>
+                                <a href="https://dev.azure.com/totvstfs/_search?" target="_blank" class="p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors">
+                                    <p class="font-bold text-brand-200 mb-1">Azure DevOps</p>
+                                    <p class="text-xs text-slate-400">Códigos de "Help" e investigação no fonte.</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="content-card bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                                <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full mb-4">FASE 2: IA GEMS</span>
+                                <h4 class="text-xl font-bold mb-4 text-slate-900">Diagnóstico Especializado</h4>
+                                <ul class="space-y-4">
+                                    <li class="flex flex-col gap-1">
+                                        <a href="https://gemini.google.com/gem/1Admy-lhq7gVNf02S9BAnBxrTK_yEiAvv?usp=sharing" target="_blank" class="font-semibold text-brand-600 hover:underline">Athena Sup</a>
+                                        <span class="text-sm text-slate-500">Dúvidas conceituais, fluxos de tela e processos padrão.</span>
+                                    </li>
+                                    <li class="flex flex-col gap-1 border-t border-slate-50 pt-3">
+                                        <a href="https://gemini.google.com/gem/1146sW5twFfozI-Y8rTlRChUzB9lHDd0D?usp=sharing" target="_blank" class="font-semibold text-brand-600 hover:underline">Athena Dev</a>
+                                        <span class="text-sm text-slate-500">Análise técnica, logs, AdvPL/TL++ e códigos de erro.</span>
+                                    </li>
+                                    <li class="flex flex-col gap-1 border-t border-slate-50 pt-3">
+                                        <a href="https://gemini.google.com/gem/167SWwOXFYW-CNiL1IH60bo7aJ6BgAUe?usp=sharing" target="_blank" class="font-semibold text-brand-600 hover:underline">Athena ECD-ECF</a>
+                                        <span class="text-sm text-slate-500">Obrigações fiscais, erros de PVA e regras contábeis.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="content-card bg-brand-900 text-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                                <span class="inline-block px-3 py-1 bg-brand-500 text-xs font-bold rounded-full mb-4">FASE 3</span>
+                                <h4 class="text-xl font-bold mb-4">Estrutura de Resolução</h4>
+                                <ul class="space-y-4 text-sm text-slate-300">
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full bg-brand-500/20 border border-brand-500/50 flex flex-shrink-0 items-center justify-center text-[10px] text-brand-200">✓</div>
+                                        <span><strong>Causa Raiz:</strong> Identificar o motivo fundamental.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full bg-brand-500/20 border border-brand-500/50 flex flex-shrink-0 items-center justify-center text-[10px] text-brand-200">✓</div>
+                                        <span><strong>Evidência:</strong> Prints, logs e provas da solução.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full bg-brand-500/20 border border-brand-500/50 flex flex-shrink-0 items-center justify-center text-[10px] text-brand-200">✓</div>
+                                        <span><strong>Solução:</strong> Passo a passo claro e replicável.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="ferramentas" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">3. Ferramentas de Auxílio</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+                    <div class="content-card bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                        <span class="inline-block px-3 py-1 bg-violet-100 text-violet-700 text-xs font-bold rounded-full mb-4">GEMs AUXILIARES</span>
+                        <h4 class="text-xl font-bold mb-4 text-slate-900">Produtividade e Documentação</h4>
+                        <ul class="space-y-4">
+                            <li class="flex flex-col gap-1">
+                                <a href="https://gemini.google.com/gem/1g1RaQAWTmjBBQ9OlYsRD_vczL-lmDVPq?usp=sharing" target="_blank" class="font-semibold text-brand-600 hover:underline">KS Builder</a>
+                                <span class="text-sm text-slate-500">Especialista na criação de artigos KCS TOTVS.</span>
+                            </li>
+                            <li class="flex flex-col gap-1 border-t border-slate-50 pt-3">
+                                <a href="https://gemini.google.com/gem/1Admy-lhq7gVNf02S9BAnBxrTK_yEiAvv?usp=sharing" target="_blank" class="font-semibold text-brand-600 hover:underline">IssueLab</a>
+                                <span class="text-sm text-slate-500">Estruturar abertura de issue no DevOps com clareza e completude.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="passos" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">4. Passos Operacionais</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="relative pl-12">
+                            <div class="absolute left-0 top-0 w-8 h-8 step-number rounded-full text-white flex items-center justify-center font-bold text-sm">1</div>
+                            <h5 class="text-lg font-bold text-slate-900 mb-2">Entendimento Inicial</h5>
+                            <p class="text-slate-600">Colete mensagens de erro, logs e o passo a passo de reprodução do cliente.</p>
+                        </div>
+                        <div class="relative pl-12">
+                            <div class="absolute left-0 top-0 w-8 h-8 step-number rounded-full text-white flex items-center justify-center font-bold text-sm">2</div>
+                            <h5 class="text-lg font-bold text-slate-900 mb-2">Pesquisa Histórica (Fase 1)</h5>
+                            <p class="text-slate-600">Use palavras-chave no Zendesk, KCS e códigos de Help no Azure DevOps.</p>
+                        </div>
+                        <div class="relative pl-12">
+                            <div class="absolute left-0 top-0 w-8 h-8 step-number rounded-full text-white flex items-center justify-center font-bold text-sm">3</div>
+                            <h5 class="text-lg font-bold text-slate-900 mb-2">Diagnóstico com IA (Fase 2)</h5>
+                            <div class="mt-3 p-4 bg-slate-100 rounded-xl border border-slate-200">
+                                <p class="text-sm font-mono text-slate-700"><strong>Dica:</strong> Para erros técnicos, cole o log no <strong>Athena Dev</strong> e peça análise da causa provável.</p>
+                            </div>
+                        </div>
+                        <div class="relative pl-12">
+                            <div class="absolute left-0 top-0 w-8 h-8 step-number rounded-full text-white flex items-center justify-center font-bold text-sm">4</div>
+                            <h5 class="text-lg font-bold text-slate-900 mb-2">Estrutura da Resposta</h5>
+                            <p class="text-slate-600">Documente Causa Raiz, Evidência e Solução Aplicada.</p>
+                        </div>
+                        <div class="relative pl-12">
+                            <div class="absolute left-0 top-0 w-8 h-8 step-number rounded-full text-white flex items-center justify-center font-bold text-sm">5</div>
+                            <h5 class="text-lg font-bold text-slate-900 mb-2">Alimentação do Ecossistema</h5>
+                            <p class="text-slate-600">Sugira novos KCS ou abra issues no DevOps para bugs identificados.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="exemplos" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">5. Exemplos de Uso</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Example 1 -->
+                        <div class="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-2xl">📋</span>
+                                <h4 class="font-bold text-lg text-slate-900">Cenário: Dúvida de Processo Standard</h4>
+                            </div>
+                            <p class="text-slate-600 mb-4 italic">"Como faço o fechamento fiscal mensal?"</p>
+                            <div class="bg-brand-50 p-4 rounded-xl border border-brand-100">
+                                <p class="text-sm text-brand-900 font-medium">Prompt Sugerido:</p>
+                                <p class="text-sm font-mono text-brand-700">"Como proceder com o fechamento mensal no SIGACTB, quais os passos e pré-requisitos?"</p>
+                            </div>
+                        </div>
+
+                        <!-- Example 2 -->
+                        <div class="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-2xl">💻</span>
+                                <h4 class="font-bold text-lg text-slate-900">Cenário: Erro Técnico com Log</h4>
+                            </div>
+                            <p class="text-slate-600 mb-4 italic">"Erro durante a importação de arquivo com log específico."</p>
+                            <pre><code>Análise solicitada à Athena Dev: "Analise este log: [cole o log]. Qual a provável causa e como posso corrigir?"</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 6 -->
+                <section id="dicas" class="mb-16 scroll-mt-24">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <h3 class="font-display font-bold text-2xl text-slate-900">6. Solução de Problemas / Dicas</h3>
+                        <div class="h-px w-8 bg-slate-200"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h5 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="text-brand-500">●</span> Especificidade no Prompt
+                            </h5>
+                            <p class="text-sm text-slate-600">Prompts detalhados geram respostas melhores. Inclua logs, nomes de tela e cenários.</p>
+                        </div>
+                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h5 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="text-brand-500">●</span> Valide Sempre
+                            </h5>
+                            <p class="text-sm text-slate-600">A IA ajuda, mas a palavra final é da documentação oficial e testes práticos.</p>
+                        </div>
+                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h5 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="text-brand-500">●</span> Inicie Pelo Histórico
+                            </h5>
+                            <p class="text-sm text-slate-600">Sempre comece pelo Zendesk e KCS antes de recorrer aos modelos de IA.</p>
+                        </div>
+                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h5 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="text-brand-500">●</span> Escolha o Modelo Certo
+                            </h5>
+                            <p class="text-sm text-slate-600">Use Athena Sup para processos, Athena Dev para código e Athena ECD-ECF para fiscal.</p>
+                        </div>
+                    </div>
+                </section>
+            </article>
+        </div>
+    </main>
+
+    <script>
+        // Simple scroll spy for active TOC link
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
