@@ -123,7 +123,11 @@ def list_users(sb):
         return __import__("pandas").DataFrame()
 
 
+PERFIS_VALIDOS = ["kcseditor", "admin"]
+
 def create_user(sb, usuario: str, nome_exibicao: str, senha: str, perfil: str) -> bool:
+    if perfil not in PERFIS_VALIDOS:
+        return False
     try:
         import os
         salt = os.urandom(32).hex()
