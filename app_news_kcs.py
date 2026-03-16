@@ -193,9 +193,14 @@ def detectar_modulo(txt: str) -> str:
     return "KCS"
 
 def limpar_titulo(t: str) -> str:
-    t = re.sub(r'^(Cross Segmento\s*[-–]\s*)?(TOTVS\s+)?Backoffice\s+(Linha\s+)?Protheus\s*[-–]\s*', '', t, flags=re.I).strip()
-    t = re.sub(r'^Cross Segmento\s*[-–]\s*', '', t, flags=re.I).strip()
-    t = re.sub(r'^TOTVS\s+Backoffice\s*\([^)]*\)\s*[-–]\s*', '', t, flags=re.I).strip()
+    # Funciona tanto com hifens (texto digitado) quanto com espaços (slug da URL)
+    sep = r'[\s\-–]+'
+    t = re.sub(r'^(Cross' + sep + r'Segmento' + sep + r')?(TOTVS' + sep + r')?Backoffice' + sep + r'(Linha' + sep + r')?Protheus' + sep, '', t, flags=re.I).strip()
+    t = re.sub(r'^Cross' + sep + r'Segmento' + sep, '', t, flags=re.I).strip()
+    t = re.sub(r'^(\([^)]*\)' + sep + r')?' + r'TOTVS' + sep + r'Backoffice(\s*\([^)]*\))?' + sep, '', t, flags=re.I).strip()
+    t = re.sub(r'^\([^)]*\)' + sep, '', t, flags=re.I).strip()
+    t = re.sub(r'^Framework' + sep + r'Framework' + sep + r'(Linha' + sep + r')?Protheus' + sep, '', t, flags=re.I).strip()
+    t = re.sub(r'^(Linha' + sep + r')?Protheus' + sep, '', t, flags=re.I).strip()
     return t
 
 def extrair_linha(linha: str):
@@ -206,38 +211,87 @@ def extrair_linha(linha: str):
     titulo_raw = linha[:m.start()].strip().rstrip('.,;:- ')
     return url, titulo_raw
 
+def slug_para_titulo(url: str) -> str:
+    """
+    Converte o slug da URL em título legível como último recurso.
+    Ex: .../38393605639191-Cross-Segmento-SIGAATF-Titulo-do-artigo
+        → "Cross Segmento - SIGAATF - Título do artigo"
+    """
+    from urllib.parse import unquote
+    slug = url.rstrip('/').split('/')[-1]
+    slug = unquote(slug)                         # decodifica %C3%A7 → ç
+    slug = re.sub(r'^\d+-', '', slug)            # remove número inicial (ID)
+    slug = slug.replace('-', ' ')                # hífens → espaços
+    # Capitaliza primeira letra de cada palavra relevante
+    palavras = slug.split()
+    titulo = ' '.join(p.capitalize() if p.islower() else p for p in palavras)
+    return titulo.strip()
+
 @st.cache_data(show_spinner=False, ttl=3600)
 def buscar_titulo_web(url: str) -> str:
+    """Busca o título real na página. Retorna string vazia se falhar."""
     try:
-        r = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
+        r = requests.get(url, timeout=10, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        })
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
+
+        # 1. <title> da página
         tag = soup.find("title")
         if tag:
             t = tag.get_text(strip=True)
-            return re.sub(r'\s*[|\-–]\s*(TOTVS|Central de Atendimento|Help).*$', '', t, flags=re.I).strip()
+            # Remove sufixo " – Central de Atendimento TOTVS" etc.
+            t = re.sub(r'\s*[|\-–—]\s*(TOTVS|Central de Atendimento|Help Center|Support).*$', '', t, flags=re.I)
+            t = t.strip()
+            if t:
+                return t
+
+        # 2. og:title
         og = soup.find("meta", property="og:title")
-        if og and og.get("content"): return og["content"].strip()
+        if og and og.get("content"):
+            return og["content"].strip()
+
+        # 3. Primeiro <h1>
         h1 = soup.find("h1")
-        if h1: return h1.get_text(strip=True)
-    except Exception: pass
+        if h1:
+            return h1.get_text(strip=True)
+
+    except Exception:
+        pass
     return ""
 
 def processar_bloco(bloco: str, data_padrao: str, buscar_web: bool) -> list:
     artigos = []
     linhas = [l.strip() for l in bloco.strip().splitlines() if l.strip()]
     if not linhas: return []
+
+    # Detecta quantas linhas não têm texto antes da URL (precisam buscar na web)
+    sem_texto = sum(
+        1 for l in linhas
+        if (lambda r: r[0] and not r[1])(extrair_linha(l))
+    )
+
     prog = st.progress(0, text="Processando...")
     for i, linha in enumerate(linhas):
         prog.progress((i + 1) / len(linhas), text=f"Processando {i+1}/{len(linhas)}...")
         url, titulo_raw = extrair_linha(linha)
         if not url: continue
+
         titulo = limpar_titulo(titulo_raw) if titulo_raw else ""
         modulo = detectar_modulo(linha)
-        if not titulo and buscar_web:
-            titulo = limpar_titulo(buscar_titulo_web(url)) or f"Artigo {i+1}"
-        elif not titulo:
-            titulo = url.split("/")[-1] or f"Artigo {i+1}"
+
+        if not titulo:
+            # Sempre tenta buscar na web quando não há texto antes da URL
+            titulo_web = buscar_titulo_web(url)
+            if titulo_web:
+                titulo = limpar_titulo(titulo_web)
+            elif buscar_web:
+                titulo = limpar_titulo(slug_para_titulo(url))
+            else:
+                # Fallback: converte slug da URL em texto legível
+                titulo = limpar_titulo(slug_para_titulo(url))
+
         artigos.append({"url": url, "title": titulo, "tag": modulo, "date": data_padrao})
     prog.empty()
     return artigos
@@ -251,7 +305,7 @@ def render_preview(bloco: str, cor: str):
     for linha in bloco.strip().splitlines():
         url, titulo_raw = extrair_linha(linha.strip())
         if url:
-            titulo = limpar_titulo(titulo_raw) if titulo_raw else url.split("/")[-1]
+            titulo = limpar_titulo(titulo_raw) if titulo_raw else slug_para_titulo(url)
             arts.append((titulo, detectar_modulo(linha)))
     if arts:
         html = "".join(
