@@ -906,16 +906,20 @@ def render_admin(sb):
 
     with tab_add:
         st.markdown("#### Novo Usuario")
+
+        if "_form_ver" not in st.session_state:
+            st.session_state["_form_ver"] = 0
+        ver = st.session_state["_form_ver"]
         ac1, ac2 = st.columns(2)
         with ac1:
-            new_user  = st.text_input("Usuario", key="_au", placeholder="nome.sobrenome")
+            new_user  = st.text_input("Usuario", key=f"_au_{ver}", placeholder="nome.sobrenome")
         with ac2:
-            new_nome  = st.text_input("Nome exibicao", key="_an", placeholder="Nome Completo")
+            new_nome  = st.text_input("Nome exibicao", key=f"_an_{ver}", placeholder="Nome Completo")
         new_perfil = st.selectbox(
             "Perfil",
             ["kcseditor", "admin"],
             format_func=lambda p: {"kcseditor": "KCS Editor — gerar e publicar", "admin": "Admin — acesso total"}[p],
-            key="_ap"
+            key=f"_ap_{ver}"
         )
         st.caption("Senha inicial: **1234** — usuario obrigado a trocar no primeiro acesso.")
         if st.button("Criar Usuario", key="btn_create"):
@@ -927,6 +931,7 @@ def render_admin(sb):
             else:
                 if create_user(sb, u, new_nome, "1234", new_perfil):
                     st.success(f"Usuario '{u}' criado. Senha inicial: 1234")
+                    st.session_state["_form_ver"] += 1
                     st.rerun()
                 else:
                     st.error("Erro ao criar (usuario ja existe?)")
