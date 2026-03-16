@@ -16,85 +16,179 @@ from bs4 import BeautifulSoup
 
 st.set_page_config(
     page_title="KCS News Generator",
-    page_icon="📰",
+    page_icon="KCS",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 st.markdown("""
 <style>
+/* ── Paleta TOTVS / Athena Support ───────────────────────────
+   Cores extraídas do styles.css do sistema:
+   --color-primary:   #002233  (azul-marinho escuro)
+   --color_paleta_a:  #004c6d  (azul principal)
+   --color_paleta_d:  #5383a1  (azul médio)
+   --color_paleta_i:  #abd2ec  (azul claro / hover)
+   --color_paleta_j:  #c1e7ff  (azul muito claro)
+   --color_paleta2_a: #f1e702  (amarelo destaque)
+─────────────────────────────────────────────────────────── */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding-top: 1.5rem !important; }
 
-.app-header {
-    background: linear-gradient(135deg, #0a0f1e 0%, #1e3a6e 100%);
-    color: white; padding: 1.6rem 2rem; border-radius: 18px; margin-bottom: 1.8rem;
-    display: flex; align-items: center; gap: 1.2rem;
-}
-.app-header h1 { font-size: 1.7rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-.app-header p  { margin: 0.25rem 0 0; opacity: 0.6; font-size: 0.83rem; }
-.hi { color: #60a5fa; }
+/* ── Fundo geral ─────────────────────────────────────────── */
+.stApp { background-color: #f3f3f3 !important; }
 
+/* ── Sidebar ─────────────────────────────────────────────── */
+section[data-testid="stSidebar"] {
+    background: #002233 !important;
+    border-right: 1px solid #004c6d !important;
+}
+section[data-testid="stSidebar"] * { color: #c1e7ff !important; }
+section[data-testid="stSidebar"] .stTextInput input,
+section[data-testid="stSidebar"] .stTextArea textarea,
+section[data-testid="stSidebar"] .stSelectbox select {
+    background: #004c6d !important;
+    border: 1px solid #5383a1 !important;
+    border-radius: 8px !important;
+    color: #f3f3f3 !important;
+}
+section[data-testid="stSidebar"] .stTextInput input:focus,
+section[data-testid="stSidebar"] .stTextArea textarea:focus {
+    border-color: #abd2ec !important;
+    background: #004c6d !important;
+}
+section[data-testid="stSidebar"] label { color: #abd2ec !important; font-size: 0.78rem !important; font-weight: 600 !important; }
+section[data-testid="stSidebar"] .stMarkdown p { color: #7faac6 !important; font-size: 0.8rem !important; }
+section[data-testid="stSidebar"] hr { border-color: #225e7e !important; margin: 1rem 0 !important; }
+section[data-testid="stSidebar"] code {
+    background: #004c6d !important;
+    color: #c1e7ff !important;
+    border: 1px solid #5383a1 !important;
+    border-radius: 4px !important;
+}
+
+/* ── Cabeçalho do app ────────────────────────────────────── */
+.app-header {
+    background: linear-gradient(135deg, #002233 0%, #004c6d 100%);
+    color: white; padding: 1.6rem 2rem; border-radius: 16px;
+    margin-bottom: 1.8rem; display: flex; align-items: center; gap: 1.2rem;
+    border: 1px solid #225e7e;
+    box-shadow: 0 4px 20px rgba(0,76,109,0.3);
+}
+.app-header h1 { font-size: 1.7rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #fff; }
+.app-header p  { margin: 0.25rem 0 0; color: #7faac6; font-size: 0.83rem; }
+.hi { color: #abd2ec; }
+
+/* ── Cards de preview de artigos ─────────────────────────── */
 .art-item {
     display: flex; align-items: flex-start; gap: 8px;
     padding: 7px 10px; border-radius: 8px;
-    background: #f8fafc; border: 1px solid #e2e8f0;
+    background: #fff; border: 1px solid #c1e7ff;
     margin-bottom: 5px; font-size: 0.82rem;
 }
 .art-tag {
     font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
     border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-top: 2px;
 }
-.art-tag.blue { background: #dbeafe; color: #1d4ed8; }
-.art-tag.teal { background: #ccfbf1; color: #0f766e; }
-.art-title { color: #1e293b; flex: 1; line-height: 1.45; }
+.art-tag.blue { background: #c1e7ff; color: #004c6d; }
+.art-tag.teal { background: #d1fae5; color: #065f46; }
+.art-title { color: #002233; flex: 1; line-height: 1.45; }
 
+/* ── Cards de contagem ───────────────────────────────────── */
 .count-card {
     text-align: center; padding: 0.9rem 0.5rem;
-    background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px;
+    background: #fff; border: 1.5px solid #abd2ec; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,76,109,0.08);
 }
 .count-card .num { font-size: 1.8rem; font-weight: 800; line-height: 1; }
 .count-card .lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-                   letter-spacing: .08em; color: #94a3b8; margin-top: 3px; }
-.blue  .num { color: #2563eb; }
-.teal  .num { color: #0d9488; }
-.purple .num { color: #7c3aed; }
-.dark   .num { font-size: 0.9rem !important; color: #334155; }
+                   letter-spacing: .08em; color: #5383a1; margin-top: 3px; }
+.blue   .num { color: #004c6d; }
+.teal   .num { color: #0d9488; }
+.purple .num { color: #3d788f; }
+.dark   .num { font-size: 0.9rem !important; color: #002233; }
 
-div.stButton > button {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    color: white !important; border: none !important;
-    font-weight: 700 !important; font-size: 0.95rem !important;
-    border-radius: 12px !important; width: 100%;
-    box-shadow: 0 4px 14px rgba(37,99,235,.3) !important;
+/* ── Inputs e textareas da área principal ────────────────── */
+.stTextArea textarea {
+    border: 1.5px solid #abd2ec !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    font-size: 0.83rem !important;
+    color: #002233 !important;
 }
-div.stButton > button:disabled { background: #cbd5e1 !important; box-shadow: none !important; }
+.stTextArea textarea:focus {
+    border-color: #004c6d !important;
+    box-shadow: 0 0 0 3px rgba(0,76,109,0.12) !important;
+}
+
+/* ── Botão principal ─────────────────────────────────────── */
+div.stButton > button {
+    background: linear-gradient(135deg, #004c6d, #002233) !important;
+    color: #f3f3f3 !important; border: none !important;
+    font-weight: 700 !important; font-size: 0.95rem !important;
+    border-radius: 10px !important; width: 100%;
+    box-shadow: 0 4px 14px rgba(0,76,109,0.35) !important;
+    transition: all .2s !important;
+}
+div.stButton > button:hover {
+    background: linear-gradient(135deg, #225e7e, #004c6d) !important;
+    box-shadow: 0 6px 20px rgba(0,76,109,0.45) !important;
+}
+div.stButton > button:disabled {
+    background: #94bed9 !important; box-shadow: none !important; opacity: 0.6 !important;
+}
+
+/* ── Botão de download ───────────────────────────────────── */
 div.stDownloadButton > button {
-    background: #475569 !important; color: white !important;
+    background: #3d788f !important; color: #fff !important;
     border: none !important; font-weight: 600 !important;
     border-radius: 10px !important; width: 100% !important;
 }
+div.stDownloadButton > button:hover {
+    background: #225e7e !important;
+}
+
+/* ── Títulos das seções ──────────────────────────────────── */
+.stMarkdown h4 { color: #004c6d !important; font-weight: 700 !important; }
+
+/* ── Separador ───────────────────────────────────────────── */
+hr { border-color: #abd2ec !important; margin: 1rem 0 !important; }
+
+/* ── Banners de sucesso / erro ───────────────────────────── */
 .ok-box {
-    background: linear-gradient(135deg,#ecfdf5,#d1fae5);
+    background: linear-gradient(135deg, #e0f4e8, #c6edd6);
     border: 1.5px solid #6ee7b7; border-radius: 14px;
     padding: 1.1rem 1.4rem; margin: 0.8rem 0;
     display: flex; gap: 12px; align-items: center;
 }
 .ok-box .icon { font-size: 1.7rem; }
-.ok-box strong { display: block; color: #065f46; }
+.ok-box strong { display: block; color: #065f46; font-size: 1rem; }
 .ok-box span   { color: #047857; font-size: 0.82rem; }
+
 .err-box {
     background: #fef2f2; border: 1.5px solid #fca5a5;
     border-radius: 14px; padding: 1rem 1.3rem; margin: 0.8rem 0;
 }
 .err-box strong { color: #991b1b; }
 .err-box p { color: #b91c1c; font-size: 0.82rem; margin: 3px 0 0; }
-.token-ok  { background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:.5rem .9rem;font-size:.8rem;color:#166534;margin-bottom:.5rem; }
-.token-err { background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:.5rem .9rem;font-size:.8rem;color:#991b1b;margin-bottom:.5rem; }
-section[data-testid="stSidebar"] { background: #f8fafc !important; }
-hr { border-color: #e2e8f0 !important; margin: 1rem 0 !important; }
+
+/* ── Status do token ─────────────────────────────────────── */
+.token-ok {
+    background: #c1e7ff; border: 1px solid #5383a1;
+    border-radius: 8px; padding: .5rem .9rem;
+    font-size: .8rem; color: #002233; font-weight: 600;
+    margin-bottom: .5rem;
+}
+.token-err {
+    background: #fff0c1; border: 1px solid #f1e702;
+    border-radius: 8px; padding: .5rem .9rem;
+    font-size: .8rem; color: #5a4a00; font-weight: 600;
+    margin-bottom: .5rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -577,7 +671,7 @@ def gerar_html(cfg: dict, novos: list, atualizados: list) -> str:
 # ─────────────────────────────────────────────────────
 st.markdown("""
 <div class="app-header">
-  <div style="font-size:2.2rem;line-height:1">📰</div>
+  <div style="font-size:1.5rem;font-weight:800;color:#abd2ec;letter-spacing:-1px">KCS</div>
   <div>
     <h1>KCS <span class="hi">News</span> Generator</h1>
     <p>Cole os artigos, configure a edição e publique direto no GitHub Pages</p>
@@ -587,13 +681,13 @@ st.markdown("""
 
 token = get_token()
 if token:
-    st.markdown('<div class="token-ok">🔑 GitHub conectado — publicação automática disponível</div>', unsafe_allow_html=True)
+    st.markdown('<div class="token-ok">GitHub conectado — publicação automática disponível</div>', unsafe_allow_html=True)
 else:
-    st.markdown('<div class="token-err">⚠️ Token GitHub não configurado — só será possível baixar o HTML</div>', unsafe_allow_html=True)
+    st.markdown('<div class="token-err">Token GitHub não configurado — só será possível baixar o HTML</div>', unsafe_allow_html=True)
 
 # ── Sidebar ───────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### ⚙️ Configurações da Edição")
+    st.markdown("### Configuracoes da Edicao")
     hoje  = datetime.now()
     mm    = hoje.strftime("%m")
     yyyy  = hoje.strftime("%Y")
@@ -608,14 +702,14 @@ with st.sidebar:
     data_pad = st.text_input("Data padrão dos artigos", value=hoje.strftime("%d/%m/%Y"))
 
     st.markdown("---")
-    st.markdown("### 📣 Manchete")
+    st.markdown("### Manchete")
     m_titulo = st.text_input("Título da manchete", value="EXTRA! EXTRA! KCS NOVOS E AJUSTADOS")
     m_texto  = st.text_area("Texto da manchete",
         value=f"Veja os KCS que foram criados e atualizados no período — Equipe {equipe_label}.",
         height=80)
 
     st.markdown("---")
-    st.markdown("### 🔧 Opções")
+    st.markdown("### Opções")
     buscar_web = st.toggle("Buscar título na web (quando só URL)",
         value=True,
         help="Acessa a página para pegar o título real. Recomendado quando colar só links.")
@@ -624,12 +718,12 @@ with st.sidebar:
     pub_url      = f"{PAGES_BASE}/{equipe_key}/{nome_arquivo}"
 
     st.markdown("---")
-    st.markdown("**📤 Vai publicar em:**")
+    st.markdown("**Vai publicar em:**")
     st.code(f"{equipe_key}/{nome_arquivo}", language=None)
-    st.caption(f"🌐 {pub_url}")
+    st.caption(f"{pub_url}")
 
 # ── Área principal ────────────────────────────────────
-st.markdown("#### 📋 Cole os artigos abaixo")
+st.markdown("#### Cole os artigos abaixo")
 st.caption("Formato: `Descrição do artigo https://link` ou só a URL — um por linha")
 
 col1, col2 = st.columns(2, gap="large")
@@ -641,11 +735,11 @@ PH_N = (
 PH_A = "Cross Segmento - SIGACTB - Funções ApExcel https://centraldeatendimento.totvs.com/hc/pt-br/articles/360007113531"
 
 with col1:
-    st.markdown("#### 📄 Artigos Novos")
+    st.markdown("#### Artigos Novos")
     txt_novos = st.text_area("novos", label_visibility="collapsed",
                              height=280, placeholder=PH_N, key="n")
 with col2:
-    st.markdown("#### 🔄 Artigos Atualizados")
+    st.markdown("#### Artigos Atualizados")
     txt_atu = st.text_area("atualizados", label_visibility="collapsed",
                            height=280, placeholder=PH_A, key="a")
 
@@ -655,7 +749,7 @@ qa = contar_links(txt_atu)
 
 if txt_novos.strip() or txt_atu.strip():
     st.markdown("---")
-    st.markdown("#### 👁️ Artigos detectados")
+    st.markdown("#### Artigos detectados")
     pv1, pv2 = st.columns(2, gap="large")
     with pv1:
         if qn:
@@ -684,13 +778,13 @@ sem_artigos = (qn + qa == 0)
 if token:
     b1, b2 = st.columns([3, 1], gap="medium")
     with b1:
-        publicar  = st.button("🚀  Gerar e Publicar no GitHub Pages",
+        publicar  = st.button("Gerar e Publicar no GitHub Pages",
                               disabled=sem_artigos, use_container_width=True)
     with b2:
-        so_baixar = st.button("⬇️  Só baixar", disabled=sem_artigos, use_container_width=True)
+        so_baixar = st.button("Baixar HTML", disabled=sem_artigos, use_container_width=True)
 else:
     publicar  = False
-    so_baixar = st.button("⬇️  Gerar e Baixar HTML",
+    so_baixar = st.button("Gerar e Baixar HTML",
                           disabled=sem_artigos, use_container_width=True)
 
 # ── Processamento ─────────────────────────────────────
@@ -710,7 +804,7 @@ if publicar or so_baixar:
     kb         = len(html_out.encode("utf-8")) // 1024
 
     st.download_button(
-        label=f"⬇️  Baixar {nome_final}",
+        label=f"Baixar {nome_final}",
         data=html_out.encode("utf-8"),
         file_name=nome_final,
         mime="text/html",
@@ -725,18 +819,18 @@ if publicar or so_baixar:
         if ok:
             st.markdown(f"""
             <div class="ok-box">
-              <div class="icon">✅</div>
+              
               <div>
                 <strong>Publicado com sucesso! ({detalhe})</strong>
                 <span>{len(novos)} novo(s) + {len(artupd)} atualizado(s) &nbsp;·&nbsp; {kb} KB &nbsp;·&nbsp; {equipe_label} {mm}/{yyyy}</span>
               </div>
             </div>""", unsafe_allow_html=True)
-            st.markdown(f"🌐 **URL pública:** [{pub_url}]({pub_url})")
-            st.caption("⏱️ O GitHub Pages pode levar até 1 minuto para refletir.")
+            st.markdown(f"**URL publica:** [{pub_url}]({pub_url})")
+            st.caption("O GitHub Pages pode levar até 1 minuto para refletir.")
         else:
             st.markdown(f"""
             <div class="err-box">
-              <strong>❌ Falha no upload</strong>
+              <strong>Falha no upload</strong>
               <p>{detalhe}</p>
             </div>""", unsafe_allow_html=True)
     else:
