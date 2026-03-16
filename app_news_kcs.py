@@ -911,7 +911,12 @@ def render_admin(sb):
             new_user  = st.text_input("Usuario", key="_au", placeholder="nome.sobrenome")
         with ac2:
             new_nome  = st.text_input("Nome exibicao", key="_an", placeholder="Nome Completo")
-        new_perfil = st.selectbox("Perfil", ["auditor", "admin"], key="_ap")
+        new_perfil = st.selectbox(
+            "Perfil",
+            ["kcseditor", "admin"],
+            format_func=lambda p: {"kcseditor": "KCS Editor — gerar e publicar", "admin": "Admin — acesso total"}[p],
+            key="_ap"
+        )
         st.caption("Senha inicial: **1234** — usuario obrigado a trocar no primeiro acesso.")
         if st.button("Criar Usuario", key="btn_create"):
             u = new_user.strip().lower()
@@ -934,7 +939,9 @@ def render_app():
     token = get_token()
     user  = st.session_state.get("_user", {})
     nome  = user.get("nome_exibicao") or user.get("usuario", "")
-    is_admin = user.get("perfil") == "admin"
+    perfil      = user.get("perfil", "")
+    is_admin    = perfil == "admin"
+    is_editor   = perfil in ("kcseditor", "admin")  # pode publicar no GitHub
 
     # Cabeçalho
     st.markdown(f"""
@@ -954,7 +961,8 @@ def render_app():
 
     # Sidebar
     with st.sidebar:
-        st.markdown(f"**{nome}** — {user.get('perfil','')}")
+        perfil_label = {"kcseditor": "KCS Editor", "admin": "Administrador"}.get(user.get("perfil",""), user.get("perfil",""))
+        st.markdown(f"**{nome}** — {perfil_label}")
         if st.button("Sair", key="btn_logout"):
             st.session_state.pop("_user", None)
             st.rerun()
@@ -1049,7 +1057,7 @@ def render_app():
         st.markdown("<br>", unsafe_allow_html=True)
         sem_artigos = (qn + qa == 0)
 
-        if token:
+        if token and is_editor:
             b1, b2 = st.columns([3, 1], gap="medium")
             with b1:
                 publicar  = st.button("Gerar e Publicar no GitHub Pages", disabled=sem_artigos, use_container_width=True)
@@ -1057,6 +1065,8 @@ def render_app():
                 so_baixar = st.button("Baixar HTML", disabled=sem_artigos, use_container_width=True)
         else:
             publicar  = False
+            if not is_editor:
+                st.caption("Seu perfil permite apenas gerar e baixar o HTML.")
             so_baixar = st.button("Gerar e Baixar HTML", disabled=sem_artigos, use_container_width=True)
 
         if publicar or so_baixar:
