@@ -667,171 +667,473 @@ def gerar_html(cfg: dict, novos: list, atualizados: list) -> str:
 </html>"""
 
 # ─────────────────────────────────────────────────────
-#  INTERFACE
+#  CSS DA TELA DE LOGIN
 # ─────────────────────────────────────────────────────
-st.markdown("""
-<div class="app-header">
-  <div style="font-size:1.5rem;font-weight:800;color:#abd2ec;letter-spacing:-1px">KCS</div>
-  <div>
-    <h1>KCS <span class="hi">News</span> Generator</h1>
-    <p>Cole os artigos, configure a edição e publique direto no GitHub Pages</p>
-  </div>
+LOGIN_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+div.block-container { padding: 0rem !important; max-width: 100% !important; }
+header, footer, [data-testid="stSidebar"] { display: none !important; }
+
+.split-left {
+    position: fixed; top: 0; left: 0;
+    width: 55vw; height: 100vh;
+    background: linear-gradient(135deg, #002233 0%, #004c6d 60%, #3d788f 100%);
+    z-index: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+}
+.split-left::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+.brand-content { color: white; text-align: center; padding: 40px; z-index: 2; position: relative; }
+.brand-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 3.8rem; font-weight: 800;
+    letter-spacing: -2px; margin-bottom: 8px;
+    background: linear-gradient(to right, #fff, #abd2ec);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem; opacity: 0.75;
+    max-width: 340px; line-height: 1.6;
+}
+.brand-badge {
+    display: inline-block; margin-top: 20px;
+    background: rgba(171,210,236,0.15);
+    border: 1px solid rgba(171,210,236,0.3);
+    color: #abd2ec; font-size: 0.72rem;
+    font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 5px 14px; border-radius: 99px;
+}
+
+.login-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 2rem; font-weight: 700;
+    color: #002233; margin: 0 0 6px;
+}
+.login-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem; color: #5383a1;
+    margin: 0 0 28px;
+}
+
+div[data-testid="stTextInput"] label {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.82rem !important;
+    color: #004c6d !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .06em !important;
+}
+div[data-testid="stTextInput"] input {
+    border-radius: 8px !important;
+    border: 1.5px solid #abd2ec !important;
+    padding: 12px 14px !important;
+    color: #002233 !important;
+    font-size: 0.95rem !important;
+    background: #f3f3f3 !important;
+}
+div[data-testid="stTextInput"] input:focus {
+    border-color: #004c6d !important;
+    box-shadow: 0 0 0 3px rgba(0,76,109,0.12) !important;
+    background: #fff !important;
+}
+div.stButton > button {
+    width: 100%; border-radius: 8px !important;
+    background: linear-gradient(to right, #002233, #004c6d) !important;
+    color: #f3f3f3 !important; border: none !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 700 !important;
+    font-family: 'Inter', sans-serif !important;
+    margin-top: 0.8rem !important;
+    letter-spacing: .02em;
+    box-shadow: 0 4px 14px rgba(0,76,109,0.3) !important;
+    transition: all .2s !important;
+}
+div.stButton > button:hover {
+    background: linear-gradient(to right, #004c6d, #225e7e) !important;
+    box-shadow: 0 6px 20px rgba(0,76,109,0.4) !important;
+}
+.login-error {
+    padding: 10px 14px;
+    background: #fff5e0; color: #7a4f00;
+    border: 1px solid #f1e702;
+    border-radius: 7px; margin-bottom: 16px;
+    font-family: 'Inter', sans-serif; font-size: 0.87rem;
+}
+.login-footer {
+    margin-top: 36px; text-align: center;
+    font-family: 'Inter', sans-serif;
+    color: #94bed9; font-size: 0.72rem;
+}
+@media (max-width: 768px) { .split-left { display: none; } }
+</style>
+<div class="split-left">
+    <div class="brand-content">
+        <div class="brand-title">KCS News</div>
+        <div class="brand-sub">Gerador de boletins de documentação para o Athena Support</div>
+        <div class="brand-badge">TOTVS Backoffice</div>
+    </div>
 </div>
-""", unsafe_allow_html=True)
+"""
 
-token = get_token()
-if token:
-    st.markdown('<div class="token-ok">GitHub conectado — publicação automática disponível</div>', unsafe_allow_html=True)
-else:
-    st.markdown('<div class="token-err">Token GitHub não configurado — só será possível baixar o HTML</div>', unsafe_allow_html=True)
 
-# ── Sidebar ───────────────────────────────────────────
-with st.sidebar:
-    st.markdown("### Configuracoes da Edicao")
-    hoje  = datetime.now()
-    mm    = hoje.strftime("%m")
-    yyyy  = hoje.strftime("%Y")
+# ─────────────────────────────────────────────────────
+#  TELAS DE LOGIN E TROCA DE SENHA
+# ─────────────────────────────────────────────────────
+def render_login(sb):
+    from auth import _ensure_admin, authenticate
+    _ensure_admin(sb)
+    st.markdown(LOGIN_CSS, unsafe_allow_html=True)
 
-    equipe_key   = st.selectbox("Equipe", options=list(EQUIPES.keys()),
-                                format_func=lambda k: EQUIPES[k])
-    equipe_label = EQUIPES[equipe_key]
+    col_vazia, col_form = st.columns([1, 1])
+    with col_form:
+        for _ in range(5):
+            st.write("")
+        with st.container():
+            _, cc, _ = st.columns([1, 5, 1])
+            with cc:
+                st.markdown('<div class="login-title">Bem-vindo</div>', unsafe_allow_html=True)
+                st.markdown('<div class="login-sub">Insira suas credenciais para continuar.</div>', unsafe_allow_html=True)
 
-    titulo_r = st.text_input("Título principal", value="Documentações criadas e atualizadas")
-    edicao   = st.text_input("Edição (ex: 02/2026)", value=f"{mm}/{yyyy}")
-    periodo  = st.text_input("Período", value=f"01/{mm}/{yyyy} a {hoje.strftime('%d/%m/%Y')}")
-    data_pad = st.text_input("Data padrão dos artigos", value=hoje.strftime("%d/%m/%Y"))
+                usuario = st.text_input("Usuário", placeholder="nome.sobrenome", key="_lu")
+                senha   = st.text_input("Senha",   type="password", placeholder="••••••", key="_ls")
 
+                err = st.session_state.get("_lerr", "")
+                if err:
+                    st.markdown(f'<div class="login-error">{err}</div>', unsafe_allow_html=True)
+
+                if st.button("Acessar", key="btn_login"):
+                    if not usuario.strip() or not senha:
+                        st.session_state["_lerr"] = "Preencha usuário e senha."
+                        st.rerun()
+                    else:
+                        user = authenticate(sb, usuario, senha)
+                        if user:
+                            st.session_state["_user"] = user
+                            st.session_state["_lerr"] = ""
+                            st.rerun()
+                        else:
+                            st.session_state["_lerr"] = "Credenciais inválidas ou usuário inativo."
+                            st.rerun()
+
+                st.markdown('<div class="login-footer">KCS News Generator &mdash; TOTVS &copy; 2026</div>', unsafe_allow_html=True)
+
+
+def render_change_password(sb):
+    from auth import change_password
+    user = st.session_state["_user"]
+    st.markdown("""<style>
+    div.block-container{padding:3rem 1rem !important;}
+    [data-testid="stSidebar"]{display:none!important;}
+    </style>""", unsafe_allow_html=True)
+    _, cc, _ = st.columns([1, 2, 1])
+    with cc:
+        st.markdown("### Definir nova senha")
+        st.info(f"Ola **{user.get('nome_exibicao') or user['usuario']}**, defina sua senha pessoal para continuar.")
+        nova     = st.text_input("Nova senha",      type="password", key="_np", placeholder="Minimo 6 caracteres")
+        confirma = st.text_input("Confirmar senha", type="password", key="_cp")
+        if st.button("Salvar senha", use_container_width=True):
+            if len(nova) < 6:
+                st.error("Minimo 6 caracteres.")
+            elif nova != confirma:
+                st.error("As senhas nao conferem.")
+            elif nova == "1234":
+                st.error("Escolha uma senha diferente da inicial.")
+            else:
+                if change_password(sb, user["id"], nova):
+                    st.session_state["_user"]["trocar_senha"] = False
+                    st.success("Senha alterada! Redirecionando...")
+                    st.rerun()
+                else:
+                    st.error("Erro ao salvar. Tente novamente.")
+
+
+# ─────────────────────────────────────────────────────
+#  PAINEL ADMIN — GESTÃO DE USUÁRIOS
+# ─────────────────────────────────────────────────────
+def render_admin(sb):
+    from auth import list_users, create_user, toggle_user, reset_password
+    import re as _re
+
+    st.markdown("### Gestão de Usuários")
+    st.caption("Senhas são criptografadas — ninguém consegue visualizar.")
+
+    users_df = list_users(sb)
+    total  = len(users_df)
+    ativos = len(users_df[users_df["ativo"] == True]) if not users_df.empty else 0
+
+    m1, m2, _ = st.columns([1, 1, 4])
+    m1.metric("Total", total)
+    m2.metric("Ativos", ativos)
     st.markdown("---")
-    st.markdown("### Manchete")
-    m_titulo = st.text_input("Título da manchete", value="EXTRA! EXTRA! KCS NOVOS E AJUSTADOS")
-    m_texto  = st.text_area("Texto da manchete",
-        value=f"Veja os KCS que foram criados e atualizados no período — Equipe {equipe_label}.",
-        height=80)
 
-    st.markdown("---")
-    st.markdown("### Opções")
-    buscar_web = st.toggle("Buscar título na web (quando só URL)",
-        value=True,
-        help="Acessa a página para pegar o título real. Recomendado quando colar só links.")
+    tab_list, tab_add = st.tabs(["Usuarios", "Novo Usuario"])
 
-    nome_arquivo = f"{mm}-{yyyy}.html"
-    pub_url      = f"{PAGES_BASE}/{equipe_key}/{nome_arquivo}"
-
-    st.markdown("---")
-    st.markdown("**Vai publicar em:**")
-    st.code(f"{equipe_key}/{nome_arquivo}", language=None)
-    st.caption(f"{pub_url}")
-
-# ── Área principal ────────────────────────────────────
-st.markdown("#### Cole os artigos abaixo")
-st.caption("Formato: `Descrição do artigo https://link` ou só a URL — um por linha")
-
-col1, col2 = st.columns(2, gap="large")
-
-PH_N = (
-    "Cross Segmento - Backoffice Linha Protheus - SIGACTB - CTBA940 - Conciliador não realiza o match automático https://centraldeatendimento.totvs.com/hc/pt-br/articles/38486359011351\n"
-    "https://centraldeatendimento.totvs.com/hc/pt-br/articles/38585578167447-Cross-Segmento-Backoffice-Linha-Protheus-SIGACTB-CTBA960-Como-realizar-a-abertura-do-calendario-cont%C3%A1bil-ap%C3%B3s-fechamento"
-)
-PH_A = "Cross Segmento - SIGACTB - Funções ApExcel https://centraldeatendimento.totvs.com/hc/pt-br/articles/360007113531"
-
-with col1:
-    st.markdown("#### Artigos Novos")
-    txt_novos = st.text_area("novos", label_visibility="collapsed",
-                             height=280, placeholder=PH_N, key="n")
-with col2:
-    st.markdown("#### Artigos Atualizados")
-    txt_atu = st.text_area("atualizados", label_visibility="collapsed",
-                           height=280, placeholder=PH_A, key="a")
-
-# ── Preview ───────────────────────────────────────────
-qn = contar_links(txt_novos)
-qa = contar_links(txt_atu)
-
-if txt_novos.strip() or txt_atu.strip():
-    st.markdown("---")
-    st.markdown("#### Artigos detectados")
-    pv1, pv2 = st.columns(2, gap="large")
-    with pv1:
-        if qn:
-            st.caption(f"**{qn} novo(s)**")
-            render_preview(txt_novos, "blue")
-    with pv2:
-        if qa:
-            st.caption(f"**{qa} atualizado(s)**")
-            render_preview(txt_atu, "teal")
-
-# ── Contadores + botões ───────────────────────────────
-st.markdown("---")
-cc1, cc2, cc3, cc4 = st.columns(4, gap="small")
-with cc1:
-    st.markdown(f'<div class="count-card blue"><div class="num">{qn}</div><div class="lbl">Novos</div></div>', unsafe_allow_html=True)
-with cc2:
-    st.markdown(f'<div class="count-card teal"><div class="num">{qa}</div><div class="lbl">Atualizados</div></div>', unsafe_allow_html=True)
-with cc3:
-    st.markdown(f'<div class="count-card purple"><div class="num">{qn+qa}</div><div class="lbl">Total</div></div>', unsafe_allow_html=True)
-with cc4:
-    st.markdown(f'<div class="count-card dark"><div class="num">{equipe_label}</div><div class="lbl">Equipe</div></div>', unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-sem_artigos = (qn + qa == 0)
-
-if token:
-    b1, b2 = st.columns([3, 1], gap="medium")
-    with b1:
-        publicar  = st.button("Gerar e Publicar no GitHub Pages",
-                              disabled=sem_artigos, use_container_width=True)
-    with b2:
-        so_baixar = st.button("Baixar HTML", disabled=sem_artigos, use_container_width=True)
-else:
-    publicar  = False
-    so_baixar = st.button("Gerar e Baixar HTML",
-                          disabled=sem_artigos, use_container_width=True)
-
-# ── Processamento ─────────────────────────────────────
-if publicar or so_baixar:
-    cfg = {
-        "titulo": titulo_r, "edicao": edicao, "periodo": periodo,
-        "manchete_titulo": m_titulo, "manchete_texto": m_texto,
-        "equipe_label": equipe_label, "equipe_key": equipe_key,
-        "mm": mm, "yyyy": yyyy,
-    }
-    with st.spinner("Processando artigos..."):
-        novos  = processar_bloco(txt_novos, data_pad, buscar_web) if txt_novos.strip() else []
-        artupd = processar_bloco(txt_atu,   data_pad, buscar_web) if txt_atu.strip()   else []
-
-    html_out   = gerar_html(cfg, novos, artupd)
-    nome_final = nome_arquivo
-    kb         = len(html_out.encode("utf-8")) // 1024
-
-    st.download_button(
-        label=f"Baixar {nome_final}",
-        data=html_out.encode("utf-8"),
-        file_name=nome_final,
-        mime="text/html",
-        use_container_width=True,
-    )
-
-    if publicar:
-        with st.spinner(f"Publicando {equipe_key}/{nome_final}..."):
-            commit_msg = f"KCS News {equipe_label} {mm}/{yyyy} — {len(novos)}N + {len(artupd)}A"
-            ok, detalhe = github_upload(token, f"{equipe_key}/{nome_final}", html_out, commit_msg)
-
-        if ok:
-            st.markdown(f"""
-            <div class="ok-box">
-              
-              <div>
-                <strong>Publicado com sucesso! ({detalhe})</strong>
-                <span>{len(novos)} novo(s) + {len(artupd)} atualizado(s) &nbsp;·&nbsp; {kb} KB &nbsp;·&nbsp; {equipe_label} {mm}/{yyyy}</span>
-              </div>
-            </div>""", unsafe_allow_html=True)
-            st.markdown(f"**URL publica:** [{pub_url}]({pub_url})")
-            st.caption("O GitHub Pages pode levar até 1 minuto para refletir.")
+    with tab_list:
+        if users_df.empty:
+            st.info("Nenhum usuario cadastrado.")
         else:
-            st.markdown(f"""
-            <div class="err-box">
-              <strong>Falha no upload</strong>
-              <p>{detalhe}</p>
-            </div>""", unsafe_allow_html=True)
+            for _, u in users_df.iterrows():
+                c1, c2, c3, c4, c5 = st.columns([2, 2, 1, 1, 1])
+                with c1:
+                    status = "Ativo" if u["ativo"] else "Inativo"
+                    cor    = "#0d9488" if u["ativo"] else "#991b1b"
+                    st.markdown(f'<span style="color:{cor};font-weight:700">{status}</span> — <b>{u["usuario"]}</b>', unsafe_allow_html=True)
+                with c2:
+                    st.caption(u.get("nome_exibicao") or "—")
+                with c3:
+                    st.caption(u["perfil"])
+                with c4:
+                    if u["usuario"] != "admin":
+                        lbl = "Desativar" if u["ativo"] else "Ativar"
+                        if st.button(lbl, key=f"ut_{u['id']}"):
+                            toggle_user(sb, u["id"], not u["ativo"])
+                            st.rerun()
+                with c5:
+                    if u["usuario"] != "admin":
+                        if st.button("Reset senha", key=f"ur_{u['id']}"):
+                            reset_password(sb, u["id"])
+                            st.success(f"Senha de '{u['usuario']}' resetada para 1234.")
+                            st.rerun()
+
+    with tab_add:
+        st.markdown("#### Novo Usuario")
+        ac1, ac2 = st.columns(2)
+        with ac1:
+            new_user  = st.text_input("Usuario", key="_au", placeholder="nome.sobrenome")
+        with ac2:
+            new_nome  = st.text_input("Nome exibicao", key="_an", placeholder="Nome Completo")
+        new_perfil = st.selectbox("Perfil", ["auditor", "admin"], key="_ap")
+        st.caption("Senha inicial: **1234** — usuario obrigado a trocar no primeiro acesso.")
+        if st.button("Criar Usuario", key="btn_create"):
+            u = new_user.strip().lower()
+            if not u:
+                st.error("Preencha o usuario.")
+            elif not _re.fullmatch(r"[a-z\u00e0-\u00fc]+(\.[a-z\u00e0-\u00fc]+)+|admin", u):
+                st.error("Formato: nome.sobrenome")
+            else:
+                if create_user(sb, u, new_nome, "1234", new_perfil):
+                    st.success(f"Usuario '{u}' criado. Senha inicial: 1234")
+                    st.rerun()
+                else:
+                    st.error("Erro ao criar (usuario ja existe?)")
+
+
+# ─────────────────────────────────────────────────────
+#  APP PRINCIPAL (gerador de news)
+# ─────────────────────────────────────────────────────
+def render_app():
+    token = get_token()
+    user  = st.session_state.get("_user", {})
+    nome  = user.get("nome_exibicao") or user.get("usuario", "")
+    is_admin = user.get("perfil") == "admin"
+
+    # Cabeçalho
+    st.markdown(f"""
+    <div class="app-header">
+      <div style="font-size:1.5rem;font-weight:800;color:#abd2ec;letter-spacing:-1px">KCS</div>
+      <div>
+        <h1>KCS <span class="hi">News</span> Generator</h1>
+        <p>Ola, <b>{nome}</b> — Cole os artigos e publique direto no GitHub Pages</p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if token:
+        st.markdown('<div class="token-ok">GitHub conectado — publicacao automatica disponivel</div>', unsafe_allow_html=True)
     else:
-        st.success(f"HTML gerado: {len(novos)} novo(s) + {len(artupd)} atualizado(s) — {kb} KB")
+        st.markdown('<div class="token-err">Token GitHub nao configurado — so sera possivel baixar o HTML</div>', unsafe_allow_html=True)
+
+    # Sidebar
+    with st.sidebar:
+        st.markdown(f"**{nome}** — {user.get('perfil','')}")
+        if st.button("Sair", key="btn_logout"):
+            st.session_state.pop("_user", None)
+            st.rerun()
+        st.markdown("---")
+        st.markdown("### Configuracoes da Edicao")
+        hoje  = datetime.now()
+        mm    = hoje.strftime("%m")
+        yyyy  = hoje.strftime("%Y")
+
+        equipe_key   = st.selectbox("Equipe", options=list(EQUIPES.keys()),
+                                    format_func=lambda k: EQUIPES[k])
+        equipe_label = EQUIPES[equipe_key]
+
+        titulo_r = st.text_input("Titulo principal", value="Documentacoes criadas e atualizadas")
+        edicao   = st.text_input("Edicao (ex: 02/2026)", value=f"{mm}/{yyyy}")
+        periodo  = st.text_input("Periodo", value=f"01/{mm}/{yyyy} a {hoje.strftime('%d/%m/%Y')}")
+        data_pad = st.text_input("Data padrao dos artigos", value=hoje.strftime("%d/%m/%Y"))
+
+        st.markdown("---")
+        st.markdown("### Manchete")
+        m_titulo = st.text_input("Titulo da manchete", value="EXTRA! EXTRA! KCS NOVOS E AJUSTADOS")
+        m_texto  = st.text_area("Texto da manchete",
+            value=f"Veja os KCS criados e atualizados no periodo — Equipe {equipe_label}.",
+            height=80)
+
+        st.markdown("---")
+        st.markdown("### Opcoes")
+        buscar_web = st.toggle("Buscar titulo na web (quando so URL)", value=True,
+            help="Acessa a pagina para pegar o titulo real.")
+
+        nome_arquivo = f"{mm}-{yyyy}.html"
+        pub_url      = f"{PAGES_BASE}/{equipe_key}/{nome_arquivo}"
+
+        st.markdown("---")
+        st.markdown("**Vai publicar em:**")
+        st.code(f"{equipe_key}/{nome_arquivo}", language=None)
+        st.caption(pub_url)
+
+    # Abas — admin tem aba extra
+    if is_admin:
+        tab_gen, tab_adm = st.tabs(["Gerador de News", "Administracao"])
+    else:
+        tab_gen = st.tabs(["Gerador de News"])[0]
+
+    with tab_gen:
+        st.markdown("#### Cole os artigos abaixo")
+        st.caption("Formato: `Descricao do artigo https://link` ou so a URL — um por linha")
+
+        col1, col2 = st.columns(2, gap="large")
+
+        PH_N = (
+            "Cross Segmento - Backoffice Linha Protheus - SIGACTB - CTBA940 - Conciliador nao realiza o match automatico "
+            "https://centraldeatendimento.totvs.com/hc/pt-br/articles/38486359011351\n"
+            "https://centraldeatendimento.totvs.com/hc/pt-br/articles/38585578167447-Cross-Segmento-Backoffice-Linha-Protheus-SIGACTB-CTBA960"
+        )
+        PH_A = "Cross Segmento - SIGACTB - Funcoes ApExcel https://centraldeatendimento.totvs.com/hc/pt-br/articles/360007113531"
+
+        with col1:
+            st.markdown("#### Artigos Novos")
+            txt_novos = st.text_area("novos", label_visibility="collapsed", height=280, placeholder=PH_N, key="n")
+        with col2:
+            st.markdown("#### Artigos Atualizados")
+            txt_atu = st.text_area("atualizados", label_visibility="collapsed", height=280, placeholder=PH_A, key="a")
+
+        qn = contar_links(txt_novos)
+        qa = contar_links(txt_atu)
+
+        if txt_novos.strip() or txt_atu.strip():
+            st.markdown("---")
+            st.markdown("#### Artigos detectados")
+            pv1, pv2 = st.columns(2, gap="large")
+            with pv1:
+                if qn:
+                    st.caption(f"**{qn} novo(s)**")
+                    render_preview(txt_novos, "blue")
+            with pv2:
+                if qa:
+                    st.caption(f"**{qa} atualizado(s)**")
+                    render_preview(txt_atu, "teal")
+
+        st.markdown("---")
+        cc1, cc2, cc3, cc4 = st.columns(4, gap="small")
+        with cc1:
+            st.markdown(f'<div class="count-card blue"><div class="num">{qn}</div><div class="lbl">Novos</div></div>', unsafe_allow_html=True)
+        with cc2:
+            st.markdown(f'<div class="count-card teal"><div class="num">{qa}</div><div class="lbl">Atualizados</div></div>', unsafe_allow_html=True)
+        with cc3:
+            st.markdown(f'<div class="count-card purple"><div class="num">{qn+qa}</div><div class="lbl">Total</div></div>', unsafe_allow_html=True)
+        with cc4:
+            st.markdown(f'<div class="count-card dark"><div class="num">{equipe_label}</div><div class="lbl">Equipe</div></div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        sem_artigos = (qn + qa == 0)
+
+        if token:
+            b1, b2 = st.columns([3, 1], gap="medium")
+            with b1:
+                publicar  = st.button("Gerar e Publicar no GitHub Pages", disabled=sem_artigos, use_container_width=True)
+            with b2:
+                so_baixar = st.button("Baixar HTML", disabled=sem_artigos, use_container_width=True)
+        else:
+            publicar  = False
+            so_baixar = st.button("Gerar e Baixar HTML", disabled=sem_artigos, use_container_width=True)
+
+        if publicar or so_baixar:
+            cfg = {
+                "titulo": titulo_r, "edicao": edicao, "periodo": periodo,
+                "manchete_titulo": m_titulo, "manchete_texto": m_texto,
+                "equipe_label": equipe_label, "equipe_key": equipe_key,
+                "mm": mm, "yyyy": yyyy,
+            }
+            with st.spinner("Processando artigos..."):
+                novos  = processar_bloco(txt_novos, data_pad, buscar_web) if txt_novos.strip() else []
+                artupd = processar_bloco(txt_atu,   data_pad, buscar_web) if txt_atu.strip()   else []
+
+            html_out   = gerar_html(cfg, novos, artupd)
+            nome_final = nome_arquivo
+            kb         = len(html_out.encode("utf-8")) // 1024
+
+            st.download_button(
+                label=f"Baixar {nome_final}",
+                data=html_out.encode("utf-8"),
+                file_name=nome_final,
+                mime="text/html",
+                use_container_width=True,
+            )
+
+            if publicar:
+                with st.spinner(f"Publicando {equipe_key}/{nome_final}..."):
+                    commit_msg = f"KCS News {equipe_label} {mm}/{yyyy} — {len(novos)}N + {len(artupd)}A"
+                    ok, detalhe = github_upload(token, f"{equipe_key}/{nome_final}", html_out, commit_msg)
+                if ok:
+                    st.markdown(f"""
+                    <div class="ok-box">
+                      <div>
+                        <strong>Publicado com sucesso! ({detalhe})</strong>
+                        <span>{len(novos)} novo(s) + {len(artupd)} atualizado(s) &nbsp;·&nbsp; {kb} KB &nbsp;·&nbsp; {equipe_label} {mm}/{yyyy}</span>
+                      </div>
+                    </div>""", unsafe_allow_html=True)
+                    st.markdown(f"**URL publica:** [{pub_url}]({pub_url})")
+                    st.caption("O GitHub Pages pode levar ate 1 minuto para refletir.")
+                else:
+                    st.markdown(f"""
+                    <div class="err-box">
+                      <strong>Falha no upload</strong>
+                      <p>{detalhe}</p>
+                    </div>""", unsafe_allow_html=True)
+            else:
+                st.success(f"HTML gerado: {len(novos)} novo(s) + {len(artupd)} atualizado(s) — {kb} KB")
+
+    if is_admin:
+        with tab_adm:
+            sb = st.session_state.get("_sb")
+            if sb:
+                render_admin(sb)
+
+
+# ─────────────────────────────────────────────────────
+#  PONTO DE ENTRADA
+# ─────────────────────────────────────────────────────
+def main():
+    from database import init_supabase
+    sb = init_supabase()
+    if not sb:
+        return
+    st.session_state["_sb"] = sb
+
+    # 1. Login
+    if not st.session_state.get("_user"):
+        render_login(sb)
+        return
+
+    # 2. Troca de senha obrigatória
+    if st.session_state["_user"].get("trocar_senha", False):
+        render_change_password(sb)
+        return
+
+    # 3. App principal
+    render_app()
+
+
+main()
